@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: Game ATM API
+  version: 1.0.0
+  description: In-game banking API allowing users to deposit, withdraw, transfer money, check balance, and view history.
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        '201':
+          description: Created
+
+  /users/{id}/balance:
+    get:
+      summary: Get user balance
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+
+  /users/{id}/deposit:
+    post:
+      summary: Deposit money to user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+      responses:
+        '201':
+          description: Deposited
+
+  /users/{id}/withdraw:
+    post:
+      summary: Withdraw money
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+      responses:
+        '201':
+          description: Withdrawn
+
+  /users/{id}/transfer:
+    post:
+      summary: Transfer to another user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                toUserId:
+                  type: integer
+                amount:
+                  type: number
+      responses:
+        '201':
+          description: Transferred
+
+  /users/{id}/history:
+    get:
+      summary: Get transaction history
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: History returned

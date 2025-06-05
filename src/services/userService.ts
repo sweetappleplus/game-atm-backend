@@ -57,3 +57,13 @@ export const transferService = async (
   );
   return result.rows[0];
 };
+
+export const getHistoryService = async (userId: number) => {
+  const result = await pool.query(
+    `SELECT * FROM transactions
+     WHERE from_user_id = $1 OR to_user_id = $1
+     ORDER BY created_at DESC`,
+    [userId]
+  );
+  return result.rows;
+};

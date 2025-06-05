@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   createUserService,
   depositService,
+  getHistoryService,
   getUserBalanceService,
   transferService,
   withdrawService,
@@ -102,6 +103,22 @@ export const transfer = async (req: Request, res: Response) => {
     res.status(201).json(result);
   } catch (error) {
     console.error("Transfer error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getHistory = async (req: Request, res: Response) => {
+  const userId = parseInt(req.params.id);
+  if (!userId) {
+    res.status(400).json({ message: "Invalid user ID" });
+    return;
+  }
+
+  try {
+    const history = await getHistoryService(userId);
+    res.json(history);
+  } catch (error) {
+    console.error("History error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
