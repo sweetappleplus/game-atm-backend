@@ -20,11 +20,12 @@ A backend API for managing in-game ATM operations including deposits, withdrawal
 src/
 ├── controllers/      # API controllers
 ├── db/               # PostgreSQL connection setup
+├── middlewares/      # Middleware
 ├── models/           # (optional) Schema definitions
 ├── routes/           # Route definitions
-├── services/         # Business logic
 ├── scripts/          # SQL schema init
-├── utils/            # (optional) helpers
+├── services/         # Business logic
+├── utils/            # helpers including validation
 ├── index.ts          # Entry point
 docs/
 └── swagger.yaml      # Swagger API docs
@@ -78,20 +79,21 @@ npm run dev
 
 ## 🧪 API Endpoints
 
-| Method | Endpoint                  | Description                     |
-|--------|---------------------------|---------------------------------|
-| POST   | `/users`                  | Create a new user               |
-| GET    | `/users/:id/balance`      | Get current balance             |
-| POST   | `/users/:id/deposit`      | Deposit money                   |
-| POST   | `/users/:id/withdraw`     | Withdraw money                  |
-| POST   | `/users/:id/transfer`     | Transfer money to another user |
-| GET    | `/users/:id/history`      | Transaction history             |
+| Method | Endpoint                     | Description                    |
+| ------ | -----------------------------| ------------------------------ |
+| POST   | `/user`                      | Create a new user              |
+| GET    | `/balance/:id`               | Get current balance            |
+| POST   | `/transaction/deposit`       | Deposit money                  |
+| POST   | `/transaction/withdraw`      | Withdraw money                 |
+| POST   | `/transaction/transfer`      | Transfer money to another user |
+| GET    | `/transaction/history/:id/`  | Transaction history            |
 
 ---
 
 ## 📄 API Documentation
 
 View Swagger docs at:
+
 ```
 http://localhost:3000/api-docs
 ```
