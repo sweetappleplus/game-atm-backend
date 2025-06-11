@@ -1,119 +1,326 @@
 openapi: 3.0.0
 info:
-  title: Game ATM API
+  title: In-Game ATM API
+  description: This is the API for the in-game ATM system, where players can manage their balance, perform transactions, and interact with their account.
   version: 1.0.0
-  description: In-game banking API allowing users to deposit, withdraw, transfer money, check balance, and view history.
-
-servers:
-  - url: http://localhost:3000
 
 paths:
-  /users:
+  /user:
     post:
       summary: Create a new user
+      description: Creates a new player with a given username and initializes their balance to zero.
+      operationId: createUser
       requestBody:
-        required: true
+        description: User details to create a new account.
         content:
           application/json:
             schema:
               type: object
+              required:
+                - username
               properties:
                 username:
                   type: string
+                  example: "player1"
       responses:
-        '201':
-          description: Created
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User created successfully"
+                  userId:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "player1"
+        "400":
+          description: Invalid input, username missing or already exists
+        "500":
+          description: Internal server error
 
-  /users/{id}/balance:
+  /balance/{userId}:
     get:
-      summary: Get user balance
+      summary: Get the balance of a user
+      description: Retrieves the current balance of a player.
+      operationId: getBalance
       parameters:
-        - in: path
-          name: id
+        - name: userId
+          in: path
+          description: ID of the user to fetch the balance for
           required: true
           schema:
             type: integer
+            example: 1
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 1
+                  balance:
+                    type: number
+                    format: float
+                    example: 100.50
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
 
-  /users/{id}/deposit:
+  /transaction/deposit:
     post:
-      summary: Deposit money to user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+      summary: Deposit money into the account
+      description: Deposits a specified amount into the user's account.
+      operationId: depositMoney
       requestBody:
-        required: true
+        description: The amount to deposit into the user's account.
         content:
           application/json:
             schema:
               type: object
+              required:
+                - userId
+                - amount
               properties:
+                userId:
+                  type: integer
+                  example: 1
                 amount:
                   type: number
+                  format: float
+                  example: 50.00
       responses:
-        '201':
-          description: Deposited
+        "200":
+          description: Deposit successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Deposit successful"
+                  balance:
+                    type: number
+                    format: float
+                    example: 150.50
+        "400":
+          description: Invalid amount, amount must be greater than zero
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
 
-  /users/{id}/withdraw:
+  /transaction/withdraw:
     post:
-      summary: Withdraw money
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+      summary: Withdraw money from the account
+      description: Withdraws a specified amount from the user's account, ensuring sufficient funds.
+      operationId: withdrawMoney
       requestBody:
-        required: true
+        description: The amount to withdraw from the user's account.
         content:
           application/json:
             schema:
               type: object
+              required:
+                - userId
+                - amount
               properties:
+                userId:
+                  type: integer
+                  example: 1
                 amount:
                   type: number
+                  format: float
+                  example: 20.00
       responses:
-        '201':
-          description: Withdrawn
+        "200":
+          description: Withdrawal successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Withdrawal successful"
+                  balance:
+                    type: number
+                    format: float
+                    example: 130.50
+        "400":
+          description: Insufficient funds or invalid amount
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
 
-  /users/{id}/transfer:
+  /transaction/transfer:
     post:
-      summary: Transfer to another user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+      summary: Transfer money between users
+      description: Transfers a specified amount from one user to another.
+      operationId: transferMoney
       requestBody:
-        required: true
+        description: Transfer details, including sender, recipient, and the amount.
         content:
           application/json:
             schema:
               type: object
+              required:
+                - fromUserId
+                - toUserId
+                - amount
               properties:
+                fromUserId:
+                  type: integer
+                  example: 1
                 toUserId:
                   type: integer
+                  example: 2
                 amount:
                   type: number
+                  format: float
+                  example: 30.00
       responses:
-        '201':
-          description: Transferred
+        "200":
+          description: Transfer successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Transfer successful"
+                  fromUserBalance:
+                    type: number
+                    format: float
+                    example: 100.50
+                  toUserBalance:
+                    type: number
+                    format: float
+                    example: 50.00
+        "400":
+          description: Insufficient funds or invalid amount
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
 
-  /users/{id}/history:
+  /transaction/history/{userId}:
     get:
-      summary: Get transaction history
+      summary: Get transaction history of a user
+      description: Retrieves a list of all transactions for a specific user.
+      operationId: getTransactionHistory
       parameters:
-        - in: path
-          name: id
+        - name: userId
+          in: path
+          description: ID of the user to fetch the transaction history for
           required: true
           schema:
             type: integer
+            example: 1
       responses:
-        '200':
-          description: History returned
+        "200":
+          description: Successful response with transaction history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: "deposit"
+                        amount:
+                          type: number
+                          format: float
+                          example: 50.00
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2025-06-01T12:00:00Z"
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - created_at
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "player1"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-06-01T12:00:00Z"
+
+    Transaction:
+      type: object
+      required:
+        - id
+        - type
+        - from_user_id
+        - to_user_id
+        - amount
+        - created_at
+      properties:
+        id:
+          type: integer
+          example: 1
+        type:
+          type: string
+          enum: ["deposit", "withdraw", "transfer"]
+          example: "deposit"
+        from_user_id:
+          type: integer
+          example: 1
+        to_user_id:
+          type: integer
+          example: 2
+        amount:
+          type: number
+          format: float
+          example: 50.00
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-06-01T12:00:00Z"
+
+    Balance:
+      type: object
+      required:
+        - user_id
+        - amount
+      properties:
+        user_id:
+          type: integer
+          example: 1
+        amount:
+          type: number
+          format: float
+          example: 100.50
