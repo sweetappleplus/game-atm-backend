@@ -5,11 +5,12 @@ import {
   transferMoneyService,
   withdrawMoneyService,
 } from "../services/transactionService";
-
+import { validateUserId, validateAmount } from "../utils/validation";
 export const depositController = async (req: Request, res: Response) => {
-  const { userId, amount } = req.body;
-
   try {
+    const { userId, amount } = req.body;
+    validateUserId(userId);
+    validateAmount(amount);
     const newBalance = await depositMoneyService(userId, amount);
     res.json({
       message: "Deposit successful",
@@ -21,9 +22,10 @@ export const depositController = async (req: Request, res: Response) => {
 };
 
 export const withdrawController = async (req: Request, res: Response) => {
-  const { userId, amount } = req.body;
-
   try {
+    const { userId, amount } = req.body;
+    validateUserId(userId);
+    validateAmount(amount);
     const newBalance = await withdrawMoneyService(userId, amount);
     res.json({
       message: "Withdrawal successful",
@@ -35,9 +37,11 @@ export const withdrawController = async (req: Request, res: Response) => {
 };
 
 export const transferController = async (req: Request, res: Response) => {
-  const { fromUserId, toUserId, amount } = req.body;
-
   try {
+    const { fromUserId, toUserId, amount } = req.body;
+    validateUserId(fromUserId, "From_User_ID");
+    validateUserId(toUserId, "To_User_ID");
+    validateAmount(amount);
     const { fromUserBalance, toUserBalance } = await transferMoneyService(
       fromUserId,
       toUserId,
@@ -57,9 +61,9 @@ export const transactionHistoryController = async (
   req: Request,
   res: Response
 ) => {
-  const userId = parseInt(req.params.userId);
-
   try {
+    const userId = parseInt(req.params.userId);
+    validateUserId(userId);
     const transactions = await getTransactionHistoryService(userId);
     res.json({ transactions });
   } catch (error) {

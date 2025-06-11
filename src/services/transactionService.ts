@@ -1,9 +1,7 @@
 import { pool } from "../db";
-import { validateAmount } from "../utils/validation";
 import { getBalanceService } from "./balanceService";
 
 export const depositMoneyService = async (userId: number, amount: number) => {
-  validateAmount(amount);
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -29,7 +27,6 @@ export const depositMoneyService = async (userId: number, amount: number) => {
 };
 
 export const withdrawMoneyService = async (userId: number, amount: number) => {
-  validateAmount(amount);
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -111,9 +108,13 @@ export const transferMoneyService = async (
 };
 
 export const getTransactionHistoryService = async (userId: number) => {
-  const res = await pool.query(
-    "SELECT type, amount, created_at FROM transactions WHERE from_user_id = $1 OR to_user_id = $1 ORDER BY created_at DESC",
-    [userId]
-  );
-  return res.rows;
+  try {
+    const res = await pool.query(
+      "SELECT type, amount, created_at FROM transactions WHERE from_user_id = $1 OR to_user_id = $1 ORDER BY created_at DESC",
+      [userId]
+    );
+    return res.rows;
+  } catch (error) {
+    throw error;
+  }
 };

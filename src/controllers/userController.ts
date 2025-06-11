@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { createUserService } from "../services/userService";
+import { validateUsername } from "../utils/validation";
 
 export const createUserController = async (req: Request, res: Response) => {
-  const { username } = req.body;
-
   try {
+    const { username } = req.body;
+    validateUsername(username);
     const newUser = await createUserService(username);
     res.status(201).json({
       message: "User created successfully",
